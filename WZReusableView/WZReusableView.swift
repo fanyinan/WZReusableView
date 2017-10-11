@@ -297,6 +297,7 @@ open class WZReusableView: UIScrollView {
       
       reusableViewDelegate?.reusableView?(self, didEndDisplaying: cell, at: cellInfo.index)
       cellInfo.cell.removeFromSuperview()
+
     }
     
     visibleCellInfoList.removeSubrange((visibleCellInfoList.count - removeCount)..<visibleCellInfoList.count)
@@ -336,7 +337,7 @@ open class WZReusableView: UIScrollView {
       guard isVisible(rect: cellFrames[i]) else { break }
       
       let cell = addCell(at: i)
-      
+
       let visibleCellInfo = VisibleCellInfo(cell: cell, index: i)
       visibleCellInfoList.append(visibleCellInfo)
       appendCellInfos.append(visibleCellInfo)
@@ -353,20 +354,21 @@ open class WZReusableView: UIScrollView {
     if let firstVisibleCellIinfo = visibleCellInfoList.first {
       lastCellIndexToLoad = firstVisibleCellIinfo.index - 1
     } else {
-      lastCellIndexToLoad = cellIndex(point: CGPoint(x: 0, y: contentOffset.y + frame.height)) ?? 0
+      //当前没有显示的cell时，从可见的最后一个开始计算
+      lastCellIndexToLoad = cellIndex(point: CGPoint(x: 0, y: min(contentOffset.y + frame.height, cellFrames.last?.origin.y ?? 0))) ?? 0
     }
-    
+
     guard lastCellIndexToLoad >= 0 && lastCellIndexToLoad < numberOfCells else { return [] }
     
     var appendCellInfos: [VisibleCellInfo] = []
     
     for i in (0...lastCellIndexToLoad).reversed() {
-      
+
       guard isVisible(rect: cellFrames[i]) else { break }
       
       let cell = addCell(at: i)
       appendCellInfos.append(VisibleCellInfo(cell: cell, index: i))
-      
+
     }
     
     visibleCellInfoList.insert(contentsOf: appendCellInfos.reversed(), at: 0)

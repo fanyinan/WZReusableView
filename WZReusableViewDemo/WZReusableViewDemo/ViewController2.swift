@@ -30,8 +30,8 @@ class ViewController2: UIViewController {
     
     navigationItem.rightBarButtonItems = [UIBarButtonItem(title: "test", style: .plain, target: self, action: #selector(ViewController2.test)),UIBarButtonItem(title: "test2", style: .plain, target: self, action: #selector(ViewController2.test2)),UIBarButtonItem(title: "test3", style: .plain, target: self, action: #selector(ViewController2.test3))]
     
-    dataSource = [Int](0..<30)
-    heights = [CGFloat](repeatElement(40, count: 30))
+    dataSource = [Int](0..<3)
+    heights = [CGFloat](repeatElement(40, count: 3))
 
   }
   

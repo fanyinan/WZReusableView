@@ -12,6 +12,7 @@ class ViewController2: UIViewController {
   
   var myReusableView: WZReusableView!
   var dataSource: [Int] = []
+  var heights: [CGFloat] = []
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -30,7 +31,8 @@ class ViewController2: UIViewController {
     navigationItem.rightBarButtonItems = [UIBarButtonItem(title: "test", style: .plain, target: self, action: #selector(ViewController2.test)),UIBarButtonItem(title: "test2", style: .plain, target: self, action: #selector(ViewController2.test2)),UIBarButtonItem(title: "test3", style: .plain, target: self, action: #selector(ViewController2.test3))]
     
     dataSource = [Int](0..<30)
-    
+    heights = [CGFloat](repeatElement(40, count: 30))
+
   }
   
   @objc private func test() {
@@ -57,18 +59,9 @@ class ViewController2: UIViewController {
   
   @objc private func test3() {
     
-    dataSource.insert(102, at: 2)
-    dataSource.insert(105, at: 5)
-    dataSource.remove(at: 12)
-    dataSource.remove(at: 13)
-    dataSource.remove(at: 14)
-
-//    myReusableView.performBatchUpdates({
-//      
-//      self.myReusableView.insert(at: [2,5], with: .fade)
-//      self.myReusableView.delete(at: [12,13,14], with: .fade)
-//
-//    }, completion: nil)
+    dataSource[1] = 1111
+    heights[1] = 150
+    myReusableView.reload(indices: [1])
   }
   
   override func viewDidAppear(_ animated: Bool) {
@@ -102,7 +95,7 @@ extension ViewController2: WZReusableViewDataSource {
   
   func reusableView(_ reusableView: WZReusableView, heightAt index: Int) -> CGFloat {
     
-    return 40
+    return heights[index]
   }
 }
 

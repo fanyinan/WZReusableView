@@ -129,21 +129,43 @@ open class WZReusableView: UIScrollView {
   
   open func reload(indices: [Int]) {
   
+    isLoadedData = false
+
+    let oldFrames = cellFrames
+    let oldContentSizeHeight = contentSize.height
+    
     for i in indices {
       
-      guard visibleCellInfoList.contains(where: {$0.index == i}) else { return }
+      guard let visibleCellInfo = visibleCellInfoList.filter({$0.index == i}).first else { continue }
       
-      visibleCellInfoList[i].cell.removeFromSuperview()
+      visibleCellInfo.cell.removeFromSuperview()
       let cell = addCell(at: i)
-      visibleCellInfoList[i].cell = cell
+      visibleCellInfo.cell = cell
     }
     
-  }
-  
-  open func append() {
+    reloadCellsFrame()
     
+    if contentSize.height < oldContentSizeHeight {
+      
+      reloadVisibleCells()
+      visibleCellInfoList.forEach({$0.cell.frame = oldFrames[$0.index]})
+      UIView.animate(withDuration: animationDuration) {
+        self.visibleCellInfoList.forEach({$0.cell.frame = self.cellFrames[$0.index]})
+      }
+      
+    } else if contentSize.height > oldContentSizeHeight {
+      
+      UIView.animate(withDuration: animationDuration, animations: {
+        self.visibleCellInfoList.forEach({$0.cell.frame = self.cellFrames[$0.index]})
+      }, completion: {_ in
+        self.reloadVisibleCells()
+      })
+    }
+
+    isLoadedData = true
+
   }
-  
+
   open func cell(at index: Int) -> WZReusableCell? {
     
     guard !visibleCellInfoList.isEmpty else { return nil }

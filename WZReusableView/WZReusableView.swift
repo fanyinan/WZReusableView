@@ -118,11 +118,13 @@ open class WZReusableView: UIScrollView {
   
   open func reloadData() {
     
-    isLoadedData = true
-    
+    isLoadedData = false
+
     reloadCellsFrame()
     reloadVisibleCells()
     
+    isLoadedData = true
+
   }
   
   open func reload(indices: [Int]) {

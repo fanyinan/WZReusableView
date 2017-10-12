@@ -32,7 +32,7 @@ class ViewController2: UIViewController {
     
     dataSource = [Int](0..<3)
     heights = [CGFloat](repeatElement(40, count: 3))
-
+    
   }
   
   @objc private func test() {
@@ -59,9 +59,16 @@ class ViewController2: UIViewController {
   
   @objc private func test3() {
     
-    dataSource[1] = 1111
-    heights[1] = 150
-    myReusableView.reload(indices: [1])
+    dataSource.append(111)
+    heights.append(50)
+    
+    dataSource.append(222)
+    heights.append(30)
+    
+    myReusableView.append()
+    
+    myReusableView.scroll(to: heights.count - 1, at: .bottom, animated: true)
+
   }
   
   override func viewDidAppear(_ animated: Bool) {

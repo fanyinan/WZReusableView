@@ -166,6 +166,32 @@ open class WZReusableView: UIScrollView {
 
   }
 
+  open func append() {
+    
+    isLoadedData = false
+    
+    let oldNumberOfCells = numberOfCells
+    numberOfCells = dataSource.numberOfCells(self)
+
+    var totalHeight: CGFloat = contentSize.height
+
+    for i in oldNumberOfCells..<numberOfCells {
+      
+      let cellHeight = dataSource.reusableView(self, heightAt: i)
+      cellFrames.append(CGRect(x: 0, y: totalHeight, width: frame.width, height: cellHeight))
+      totalHeight += cellHeight
+      
+    }
+    
+    contentSize = CGSize(width: frame.width, height: totalHeight)
+    contentView.frame = CGRect(origin: .zero, size: contentSize)
+    
+    appendAtBottom()
+    
+    isLoadedData = true
+    
+  }
+  
   open func cell(at index: Int) -> WZReusableCell? {
     
     guard !visibleCellInfoList.isEmpty else { return nil }
@@ -196,7 +222,7 @@ open class WZReusableView: UIScrollView {
   
   open func index(at point: CGPoint) -> Int? {
     
-    guard frame.contains(point) else { return nil }
+    guard contentView.frame.contains(point) else { return nil }
     
     for visibleCellInfo in visibleCellInfoList {
       
@@ -379,10 +405,10 @@ open class WZReusableView: UIScrollView {
   private func isVisible(rect: CGRect) -> Bool {
     
     func isVisible(y: CGFloat) -> Bool {
-      return y >= max(contentOffset.y, 0) && y <= min(contentOffset.y + frame.height, contentSize.height == 0 ? CGFloat.greatestFiniteMagnitude : contentSize.height)
+      return y >= max(contentOffset.y, 0) && y < min(contentOffset.y + frame.height, contentSize.height == 0 ? CGFloat.greatestFiniteMagnitude : contentSize.height)
     }
     
-    return isVisible(y: rect.minY) || isVisible(y: rect.maxY)
+    return isVisible(y: rect.minY) || isVisible(y: rect.maxY - 1)
   }
   
   private func addCellIntoReusableCellPool(cell: WZReusableCell) {

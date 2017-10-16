@@ -88,7 +88,7 @@ open class WZReusableView: UIScrollView {
   
   override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
     
-    guard isLoadedData else { return }
+    guard dataSource != nil && isLoadedData else { return }
     
     guard let new = (change?[NSKeyValueChangeKey.newKey] as? NSValue)?.cgPointValue else { return }
     guard let old = (change?[NSKeyValueChangeKey.oldKey] as? NSValue)?.cgPointValue else { return }

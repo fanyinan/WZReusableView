@@ -95,6 +95,7 @@ open class WZReusableView: UIScrollView {
     
     let changedContentOffset = new.y - old.y
     
+    
     guard changedContentOffset != 0 else { return }
     
     removeCell(changedContentOffset: changedContentOffset)
@@ -351,7 +352,7 @@ open class WZReusableView: UIScrollView {
     if let lastVisibleCellIinfo = visibleCellInfoList.last {
       firstCellIndexToLoad = lastVisibleCellIinfo.index + 1
     } else {
-      firstCellIndexToLoad = cellIndex(point: CGPoint(x: 0, y: contentOffset.y)) ?? 0
+      firstCellIndexToLoad = cellIndex(point: CGPoint(x: 0, y: contentOffset.y + 1)) ?? 0
     }
     
     guard firstCellIndexToLoad >= 0 && firstCellIndexToLoad < numberOfCells else { return [] }

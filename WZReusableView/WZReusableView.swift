@@ -409,7 +409,7 @@ open class WZReusableView: UIScrollView {
       return y >= max(contentOffset.y, 0) && y < min(contentOffset.y + frame.height, contentSize.height == 0 ? CGFloat.greatestFiniteMagnitude : contentSize.height)
     }
     
-    return isVisible(y: rect.minY) || isVisible(y: rect.maxY - 1)
+    return isVisible(y: rect.minY) || isVisible(y: rect.maxY - 1) || rect.height >= frame.height
   }
   
   private func addCellIntoReusableCellPool(cell: WZReusableCell) {

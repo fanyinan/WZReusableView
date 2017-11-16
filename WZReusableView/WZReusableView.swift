@@ -56,7 +56,8 @@ open class WZReusableView: UIScrollView {
   private var cellFrames: [CGRect] = []
   private var contentView = UIView()
   private var visibleCellInfoList: [VisibleCellInfo] = []
-  
+  private var changedContentOffset: CGFloat = 0
+
   public private(set) var numberOfCells = 0
   public var visibleCells: [WZReusableCell] { return visibleCellInfoList.map({$0.cell}) }
   public var indicesForVisibleCells: [Int] { return visibleCellInfoList.map({$0.index}) }
@@ -64,6 +65,7 @@ open class WZReusableView: UIScrollView {
   private let animationDuration: TimeInterval = 0.3
   private var insertIndices: [Int] = [], deleteIndices: [Int] = []
   private var isMultipleAnimation = false
+  
   
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -84,6 +86,10 @@ open class WZReusableView: UIScrollView {
   open override func layoutSubviews() {
     super.layoutSubviews()
 
+    guard changedContentOffset != 0 else { return }
+
+    removeCell(changedContentOffset: changedContentOffset)
+    appendCell(changedContentOffset: changedContentOffset)
   }
   
   override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
@@ -93,14 +99,12 @@ open class WZReusableView: UIScrollView {
     guard let new = (change?[NSKeyValueChangeKey.newKey] as? NSValue)?.cgPointValue else { return }
     guard let old = (change?[NSKeyValueChangeKey.oldKey] as? NSValue)?.cgPointValue else { return }
     
-    let changedContentOffset = new.y - old.y
-    
+    self.changedContentOffset = new.y - old.y
     
     guard changedContentOffset != 0 else { return }
     
-    removeCell(changedContentOffset: changedContentOffset)
-    appendCell(changedContentOffset: changedContentOffset)
-    
+    setNeedsLayout()
+
   }
   
   open func register(cellClass: WZReusableCell.Type) {
@@ -405,11 +409,10 @@ open class WZReusableView: UIScrollView {
   
   private func isVisible(rect: CGRect) -> Bool {
     
-    func isVisible(y: CGFloat) -> Bool {
-      return y >= max(contentOffset.y, 0) && y < min(contentOffset.y + frame.height, contentSize.height == 0 ? CGFloat.greatestFiniteMagnitude : contentSize.height)
-    }
+    let minY = max(contentOffset.y, 0)
+    let maxY = min(contentOffset.y + frame.height, contentSize.height == 0 ? CGFloat.greatestFiniteMagnitude : contentSize.height)
     
-    return isVisible(y: rect.minY) || isVisible(y: rect.maxY - 1) || rect.height >= frame.height
+    return rect.intersects(CGRect(x: 0, y: minY, width: rect.width, height: maxY - minY))
   }
   
   private func addCellIntoReusableCellPool(cell: WZReusableCell) {

@@ -30,9 +30,16 @@ class ViewController2: UIViewController {
     
     navigationItem.rightBarButtonItems = [UIBarButtonItem(title: "test", style: .plain, target: self, action: #selector(ViewController2.test)),UIBarButtonItem(title: "test2", style: .plain, target: self, action: #selector(ViewController2.test2)),UIBarButtonItem(title: "test3", style: .plain, target: self, action: #selector(ViewController2.test3))]
     
-    dataSource = [Int](0..<3)
-    heights = [CGFloat](repeatElement(740, count: 30))
-    
+    dataSource = [Int](0..<30)
+    heights = [CGFloat](repeatElement(40, count: 20))
+    heights.append(contentsOf: [CGFloat](repeatElement(2000, count: 2)))
+    heights.append(contentsOf: [CGFloat](repeatElement(100, count: 8)))
+
+  }
+  
+  override func viewDidLayoutSubviews() {
+    myReusableView.reloadData()
+    myReusableView.scroll(to: 29, at: .bottom, animated: false)
   }
   
   @objc private func test() {
@@ -72,7 +79,7 @@ class ViewController2: UIViewController {
   }
   
   override func viewDidAppear(_ animated: Bool) {
-    myReusableView.reloadData()
+//    myReusableView.reloadData()
 //    myReusableView.scroll(to: 29, at: .bottom, animated: false)
   }
   

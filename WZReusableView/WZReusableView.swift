@@ -56,8 +56,7 @@ open class WZReusableView: UIScrollView {
   private var cellFrames: [CGRect] = []
   private var contentView = UIView()
   private var visibleCellInfoList: [VisibleCellInfo] = []
-  private var changedContentOffset: CGFloat = 0
-
+  
   public private(set) var numberOfCells = 0
   public var visibleCells: [WZReusableCell] { return visibleCellInfoList.map({$0.cell}) }
   public var indicesForVisibleCells: [Int] { return visibleCellInfoList.map({$0.index}) }
@@ -83,15 +82,6 @@ open class WZReusableView: UIScrollView {
     fatalError("init(coder:) has not been implemented")
   }
   
-  open override func layoutSubviews() {
-    super.layoutSubviews()
-
-    guard changedContentOffset != 0 else { return }
-
-    removeCell(changedContentOffset: changedContentOffset)
-    appendCell(changedContentOffset: changedContentOffset)
-  }
-  
   override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
     
     guard dataSource != nil && isLoadedData else { return }
@@ -99,12 +89,13 @@ open class WZReusableView: UIScrollView {
     guard let new = (change?[NSKeyValueChangeKey.newKey] as? NSValue)?.cgPointValue else { return }
     guard let old = (change?[NSKeyValueChangeKey.oldKey] as? NSValue)?.cgPointValue else { return }
     
-    self.changedContentOffset = new.y - old.y
+    let changedContentOffset = new.y - old.y
     
     guard changedContentOffset != 0 else { return }
     
-    setNeedsLayout()
-
+    removeCell(changedContentOffset: changedContentOffset)
+    appendCell(changedContentOffset: changedContentOffset)
+    
   }
   
   open func register(cellClass: WZReusableCell.Type) {
@@ -265,21 +256,18 @@ open class WZReusableView: UIScrollView {
     contentSize = CGSize(width: frame.width, height: totalHeight)
     contentView.frame = CGRect(origin: .zero, size: contentSize)
   }
-
-  private func reloadVisibleCells() {
   
+  private func reloadVisibleCells() {
+    
     visibleCellInfoList.forEach({$0.cell.removeFromSuperview()})
     visibleCellInfoList.forEach({addCellIntoReusableCellPool(cell: $0.cell)})
     visibleCellInfoList.removeAll()
     
-    for (index, cellFrame) in cellFrames.enumerated() {
+    for (index, cellFrame) in cellFrames.enumerated() where isVisible(rect: cellFrame) {
       
-      if isVisible(rect: cellFrame) {
-        
-        let cell = addCell(at: index)
-        visibleCellInfoList.append(VisibleCellInfo(cell: cell, index: index))
-        
-      }
+      let cell = addCell(at: index)
+      visibleCellInfoList.append(VisibleCellInfo(cell: cell, index: index))
+      
     }
   }
   
@@ -351,7 +339,7 @@ open class WZReusableView: UIScrollView {
   @discardableResult
   private func appendAtBottom() -> [VisibleCellInfo] {
     
-    var firstCellIndexToLoad = 0
+    let firstCellIndexToLoad: Int
     
     if let lastVisibleCellIinfo = visibleCellInfoList.last {
       firstCellIndexToLoad = lastVisibleCellIinfo.index + 1
@@ -380,7 +368,7 @@ open class WZReusableView: UIScrollView {
   @discardableResult
   private func appendAtTop() -> [VisibleCellInfo] {
     
-    var lastCellIndexToLoad = 0
+    let lastCellIndexToLoad: Int
     
     if let firstVisibleCellIinfo = visibleCellInfoList.first {
       lastCellIndexToLoad = firstVisibleCellIinfo.index - 1
